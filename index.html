@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TickByTickData - Inquiry Now</title>
+    <meta name="description"
+        content="Access high-quality financial data including forex, indices, futures, and cryptocurrency from TickByTickData. Offering tick-by-tick, 1min, 5min, 60min OHLC data from 1987 and real-time feeds.">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <header class="bg-primary text-white text-center py-2">
+        <div class="container">
+            <p>Send mail</p>
+        </div>
+    </header>
+
+
+
+
+    <main class="container my-5">
+        <header class="text-center mb-4">
+            <h1>Inquiry Now</h1>
+        </header>
+
+        <form class="quote-form" id="enquiry-form" method="post" action="">
+            <div class="mb-3">
+                <label for="name" class="form-label">Name</label>
+                <input type="text" id="name" name="name" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="email" class="form-label">E-mail</label>
+                <input type="email" id="email" name="email" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="number" class="form-label">Phone Number</label>
+                <input type="number" id="number" name="mobile" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="product" class="form-label">Select Product</label>
+                <select id="product" name="product" class="form-select" required>
+                    <option value="">Choose a Product</option>
+                    <option value="Product1">Historical Data</option>
+                    <option value="Product2">Real-Time Feeds</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary mt-3">Submit Inquiry</button>
+        </form>
+    </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            function handleFormSubmission(formId, responseMessageId) {
+                $(formId).on('submit', function (e) {
+                    $(responseMessageId).removeClass('alert-success').text('').hide();
+                    e.preventDefault();
+                    $.ajax({
+                        type: 'POST',
+                        url: 'mail.php',
+                        data: $(this).serialize(),
+                        success: function (response) {
+                            var jsonResponse = JSON.parse(response);
+                            $(responseMessageId).removeClass('alert-danger').addClass('alert-success').text(jsonResponse.message).show();
+                            $(formId)[0].reset();
+                        },
+                        error: function () {
+                            $(responseMessageId).removeClass('alert-success').addClass('alert-danger').text('There was an error sending your enquiry. Please try again.').show();
+                        }
+                    });
+                });
+            }
+            handleFormSubmission('#enquiry-form', '#response-message');
+        });
+    </script>
+</body>
+
+</html>
