@@ -9,27 +9,40 @@ require 'vendor/autoload.php';
 // Function to load and populate the email template
 function loadTemplate($templateFile, $placeholders)
 {
+    if (!file_exists($templateFile)) {
+        throw new Exception("Template file not found.");
+    }
+
     $templateContent = file_get_contents($templateFile);
     foreach ($placeholders as $key => $value) {
-        $templateContent = str_replace("{{" . $key . "}}", htmlspecialchars($value), $templateContent);
+        $templateContent = str_replace("{{" . $key . "}}", htmlspecialchars($value, ENT_QUOTES, 'UTF-8'), $templateContent);
     }
     return $templateContent;
 }
 
+// Set JSON response header
+header('Content-Type: application/json');
+
 // Check if the form is submitted
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
     // Validate and sanitize input
-    $name = filter_var($_POST['name'], FILTER_SANITIZE_STRING);
-    $mobile = filter_var($_POST['mobile'], FILTER_SANITIZE_STRING);
-    $email = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
-    $product = filter_var($_POST['product'], FILTER_SANITIZE_STRING);
+    $name = $_POST['name'];
+    $mobile = $_POST['mobile'];
+    $email = $_POST['email'];
+    $message = $_POST['message'];
+
+    if (!$email) {
+        echo json_encode(["message" => "Invalid email address."]);
+        exit;
+    }
 
     // Define placeholders and their values
     $placeholders = [
         'enq_name' => $name,
         'enq_mobile' => $mobile,
         'enq_email' => $email,
-        'product' => $product
+        'message' => $message
     ];
 
     $mail = new PHPMailer(true);
@@ -40,17 +53,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Server settings
         $mail->isSMTP();
-        $mail->Host       = 'smtp.hostinger.com';
+        $mail->Host       = 'brandeducer.store';
         $mail->SMTPAuth   = true;
-        $mail->Username   = 'test@nakodagems.com';
-        $mail->Password   = 'Narendra@12345';
-        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-        $mail->Port       = 587; // Use 587 for TLS
+        $mail->Username   = 'test@brandeducer.store';
+        $mail->Password   = 'l@D83#.F?3*D';
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS; // Use SMTPS for port 465
+        $mail->Port       = 465;
 
         // Recipients
-        $mail->setFrom('test@nakodagems.com', 'Mailer');
-        $mail->addAddress('narendrask786@gmail.com', 'Recipient Name');
-        $mail->addBCC('info@tickbytickdata.com', 'BCC Recipient Name');
+        $mail->setFrom('test@brandeducer.store', 'Mailer');
+        $mail->addAddress('test@brandeducer.store', 'Recipient Name');
+        $mail->addBCC('test@brandeducer.store', 'BCC Recipient Name');
 
         // Content
         $mail->isHTML(true);
@@ -62,7 +75,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         echo json_encode(["message" => "Your enquiry has been successfully sent!"]);
     } catch (Exception $e) {
         error_log("Mailer Error: {$mail->ErrorInfo}");
-        echo json_encode(["message" => "An error occurred while sending your enquiry. Please try again later."]);
+        echo json_encode(["message" => $mail->ErrorInfo]);
     }
 } else {
     echo json_encode(["message" => "Invalid request method"]);
