@@ -1,88 +1,74 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TickByTickData - Inquiry Now</title>
-    <meta name="description"
-        content="Access high-quality financial data including forex, indices, futures, and cryptocurrency from TickByTickData. Offering tick-by-tick, 1min, 5min, 60min OHLC data from 1987 and real-time feeds.">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@100..900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
-</head>
-
-<body>
-    <header class="bg-primary text-white text-center py-2">
-        <div class="container">
-            <p>Send mail</p>
-        </div>
-    </header>
+                        <form class="quote-form  email-enquery-form" method="post" action="">
+                        <div class="form_inner form_inner_2">
+                           <input type="text" name="name" class="form-control" placeholder="Name" id="name">
+                           <input type="text" name="mobile" class="form-control number-only" placeholder="Mobile No"
+                              id="qMobileNomodal2">
+                           <input type="email" name="email" class="form-control email-address" placeholder="E-Mail Address"
+                              id="qEmailIDmodal2">
+                           <input class="form-control" type="text" placeholder="Comments.." name="message" id="qMessagemodal2">
+                           <button type="submit" class="btn btn-warning">submit</button>
+                           <div class="inp-box"
+                              style="display: flex; justify-content: center; align-items: baseline; padding-top: 10px; text-align: left; font-size: 10px;">
+                              <input type="checkbox" checked="" id="vehicle1" name="vehicle1" value="form-checkbox">
+                              <label for="vehicle1" class="inp-txt" style="padding-left: 10px; "> I authorize company
+                              representatives to Call, SMS, Email or WhatsApp me about its products and offers. This consent
+                              overrides any registration for DNC/NDNC.</label>
+                           </div>
+                        </div>
+                        <div id="response-message" style="display: none;" class="alert"></div>
+                     </form>
 
 
+      <script>
 
+ 
+ async function handleFormSubmit(form,event){
+   
+   var responseElement = form.querySelector("#response-message");
 
-    <main class="container my-5">
-        <header class="text-center mb-4">
-            <h1>Inquiry Now</h1>
-        </header>
+   responseElement.classList.remove('alert-success', 'alert-danger');
 
-        <form class="quote-form" id="enquiry-form" method="post" action="">
-            <div class="mb-3">
-                <label for="name" class="form-label">Name</label>
-                <input type="text" id="name" name="name" class="form-control" required>
-            </div>
+   responseElement.textContent = '';
 
-            <div class="mb-3">
-                <label for="email" class="form-label">E-mail</label>
-                <input type="email" id="email" name="email" class="form-control" required>
-            </div>
-
-            <div class="mb-3">
-                <label for="number" class="form-label">Phone Number</label>
-                <input type="number" id="number" name="mobile" class="form-control" required>
-            </div>
-
-            <div class="mb-3">
-                <label for="product" class="form-label">Select Product</label>
-                <select id="product" name="product" class="form-select" required>
-                    <option value="">Choose a Product</option>
-                    <option value="Product1">Historical Data</option>
-                    <option value="Product2">Real-Time Feeds</option>
-                </select>
-            </div>
-            <button type="submit" class="btn btn-primary mt-3">Submit Inquiry</button>
-        </form>
-    </main>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
-    <script>
-        $(document).ready(function () {
-            function handleFormSubmission(formId, responseMessageId) {
-                $(formId).on('submit', function (e) {
-                    $(responseMessageId).removeClass('alert-success').text('').hide();
-                    e.preventDefault();
-                    $.ajax({
-                        type: 'POST',
-                        url: 'mail.php',
-                        data: $(this).serialize(),
-                        success: function (response) {
-                            var jsonResponse = JSON.parse(response);
-                            $(responseMessageId).removeClass('alert-danger').addClass('alert-success').text(jsonResponse.message).show();
-                            $(formId)[0].reset();
-                        },
-                        error: function () {
-                            $(responseMessageId).removeClass('alert-success').addClass('alert-danger').text('There was an error sending your enquiry. Please try again.').show();
-                        }
-                    });
-                });
+   responseElement.style.display = 'none';
+   
+   var formData  =  new FormData(event.target);
+   try {
+      const response = await fetch(
+                           'mail.php', /// path
+                              {                 
+                                  method: 'POST',
+                                  body: formData
+                              }
+                        );
+         
+          if (response.ok) {
+              const jsonResponse = await response.json();
+              responseElement.classList.add('alert-success');
+              responseElement.textContent = jsonResponse.message;
+              responseElement.style.display = 'block';
+              form.reset();
+            } else {
+                throw new Error('Failed to send enquiry');
             }
-            handleFormSubmission('#enquiry-form', '#response-message');
-        });
-    </script>
-</body>
+   } catch (error) {
+      responseElement.classList.add('alert-danger');
+      responseElement.textContent = 'There was an error sending your enquiry. Please try again.';
+      responseElement.style.display = 'block';
+   }
+}
 
-</html>
+
+         // form submit function system
+document.addEventListener("DOMContentLoaded",()=>{ 
+    document.querySelectorAll(".email-enquery-form").forEach((form, val) => {
+       form.addEventListener("submit", (event) => {
+           console.log("form request detected");
+            event.preventDefault();
+            handleFormSubmit(form, event);
+        });
+    });
+});
+
+ 
+</script>
