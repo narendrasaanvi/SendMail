@@ -55,8 +55,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $mail->isSMTP();
         $mail->Host       = 'brandeducer.store';
         $mail->SMTPAuth   = true;
-        $mail->Username   = 'test@brandeducer.store';
-        $mail->Password   = 'l@D83#.F?3*D';
+        $mail->Username   = '';
+        $mail->Password   = '';
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS; // Use SMTPS for port 465
         $mail->Port       = 465;
 
